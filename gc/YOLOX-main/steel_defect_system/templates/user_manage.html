@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}用户管理 - NEU-DET{% endblock %}
+{% block content %}
+<div class="card mt-4">
+    <div class="card-header">
+        <i class="fas fa-users-gear me-2"></i>用户管理
+    </div>
+    <div class="card-body">
+        <!-- 添加用户表单 -->
+        <div class="bg-light p-4 rounded-3 mb-4">
+            <h5 class="mb-3"><i class="fas fa-user-plus me-2 text-success"></i>添加新用户</h5>
+            <form method="post" action="{{ url_for('add_user') }}" class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="username" class="form-control" placeholder="输入用户名" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="password" name="password" class="form-control" placeholder="设置密码" required>
+                </div>
+                <div class="col-md-3">
+                    <select name="role" class="form-select">
+                        <option value="user">普通用户</option>
+                        <option value="admin">管理员</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100"><i class="fas fa-plus me-1"></i>添加用户</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 用户列表表格 -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>角色</th>
+                        <th>注册时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for u in users %}
+                    <tr id="userRow{{ u.id }}">
+                        <td>{{ u.id }}</td>
+                        <td><strong>{{ u.username }}</strong></td>
+                        <td><span class="badge {{ 'bg-primary' if u.role=='admin' else 'bg-secondary' }}">{{ '管理员' if u.role=='admin' else '普通用户' }}</span></td>
+                        <td><i class="far fa-calendar-alt me-1 text-muted"></i>{{ u.created_at.strftime('%Y-%m-%d %H:%M') if u.created_at else '-' }}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-warning me-1"
+                                    onclick="openEditModal({{ u.id }}, '{{ u.username }}', '{{ u.role }}')">
+                                <i class="fas fa-edit"></i> 编辑
+                            </button>
+                            <a href="{{ url_for('delete_user', user_id=u.id) }}" 
+                               class="btn btn-sm btn-outline-danger"
+                               onclick="return confirm('确定要删除用户「{{ u.username }}」吗？此操作不可恢复！')">
+                                <i class="fas fa-trash"></i> 删除
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 统一的编辑模态框（放在表格外部） -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" action="" id="editUserForm">
+            <input type="hidden" name="user_id" id="editUserId">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title"><i class="fas fa-user-edit me-2"></i>编辑用户</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="editUsername" class="form-label fw-bold">用户名</label>
+                        <input type="text" name="username" id="editUsername" class="form-control form-control-lg" 
+                               placeholder="请输入用户名" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPassword" class="form-label fw-bold">新密码</label>
+                        <input type="password" name="password" id="editPassword" class="form-control" 
+                               placeholder="留空则不修改密码">
+                        <div class="form-text">如需修改密码请填写，留空保持原密码不变</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRole" class="form-label fw-bold">角色权限</label>
+                        <select name="role" id="editRole" class="form-select form-select-lg">
+                            <option value="user">普通用户</option>
+                            <option value="admin">管理员</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-lg" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>取消
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save me-1"></i>保存修改
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditModal(userId, username, role) {
+    document.getElementById('editUserId').value = userId;
+    document.getElementById('editUsername').value = username;
+    document.getElementById('editPassword').value = '';
+    
+    const roleSelect = document.getElementById('editRole');
+    roleSelect.value = role || 'user';
+    
+    const form = document.getElementById('editUserForm');
+    form.action = '/user/edit/' + userId;
+    
+    const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

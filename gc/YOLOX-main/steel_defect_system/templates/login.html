@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}登录 - NEU-DET{% endblock %}
+
+{% block content %}
+<div class="login-wrapper">
+    <div class="login-card animate-fade-in-up">
+        <!-- Logo -->
+        <div class="login-logo">
+            <i class="fas fa-microscope"></i>
+        </div>
+
+        <!-- Title -->
+        <h1 class="login-title">欢迎回来</h1>
+        <p class="login-subtitle">登录您的 NEU-DET 企业账户</p>
+
+        <!-- Login Form -->
+        <form method="post">
+            <!-- Username -->
+            <div class="mb-3">
+                <label class="form-label"><i class="fas fa-user me-2"></i>用户名</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-at text-muted"></i>
+                    </span>
+                    <input type="text" name="username" class="form-control border-start-0 ps-0" 
+                           placeholder="请输入用户名" required autofocus>
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-4">
+                <label class="form-label"><i class="fas fa-lock me-2"></i>密码</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-key text-muted"></i>
+                    </span>
+                    <input type="password" name="password" class="form-control border-start-0 ps-0" 
+                           placeholder="请输入密码" required id="passwordInput">
+                    <button class="btn btn-outline-secondary border-start-0" type="button" 
+                            onclick="togglePassword()" id="toggleBtn">
+                        <i class="fas fa-eye" id="eyeIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                <i class="fas fa-sign-in-alt me-2"></i>登录系统
+            </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="login-divider">
+            或
+        </div>
+
+        <!-- Register Link -->
+        <p class="text-center mb-0">
+            还没有企业账户？ 
+            <a href="{{ url_for('register') }}" class="fw-bold text-decoration-none" style="color: var(--primary);">
+                立即注册 <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </p>
+
+        <!-- Features -->
+        <div class="row mt-4 pt-4 border-top">
+            <div class="col-4 text-center">
+                <i class="fas fa-shield-alt text-success mb-2 d-block fs-5"></i>
+                <small class="text-muted">安全加密</small>
+            </div>
+            <div class="col-4 text-center">
+                <i class="fas fa-bolt text-warning mb-2 d-block fs-5"></i>
+                <small class="text-muted">快速响应</small>
+            </div>
+            <div class="col-4 text-center">
+                <i class="fas fa-brain text-primary mb-2 d-block fs-5"></i>
+                <small class="text-muted">AI驱动</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword() {
+    const input = document.getElementById('passwordInput');
+    const icon = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+</script>
+{% endblock %}

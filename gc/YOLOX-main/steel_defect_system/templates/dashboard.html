@@ -1,0 +1,900 @@
+{% extends "base.html" %}
+{% block title %}仪表板 - NEU-DET{% endblock %}
+{% block content %}
+
+<div class="dashboard-container">
+    <div class="hero-section animate-fade-in-up">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="hero-content">
+                        <div class="hero-badge">
+                            <i class="fas fa-bolt me-2"></i>AI-Powered Detection
+                        </div>
+                        <h1 class="hero-title">
+                            欢迎，<span class="text-primary">{{ user.username }}</span>
+                        </h1>
+                        <p class="hero-subtitle">
+                            钢材表面缺陷智能检测系统 v2.0<br>
+                            <small class="text-muted">基于深度学习的工业级缺陷识别解决方案</small>
+                        </p>
+                        <div class="hero-actions mt-4">
+                            <a href="{{ url_for('detect') }}" class="btn btn-primary btn-lg px-5">
+                                <i class="fas fa-play-circle me-2"></i>开始检测
+                            </a>
+                            <button class="btn btn-outline-primary btn-lg px-4 ms-2" onclick="scrollToFeatures()">
+                                <i class="fas fa-info-circle me-2"></i>了解更多
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 d-none d-lg-block">
+                    <div class="hero-illustration">
+                        <div class="floating-card card-1">
+                            <i class="fas fa-brain"></i>
+                            <span>深度学习</span>
+                        </div>
+                        <div class="floating-card card-2">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>高精度</span>
+                        </div>
+                        <div class="floating-card card-3">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>实时处理</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-5" id="features-section">
+        <div class="row g-4 mb-5">
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card stat-card-blue animate-fade-in-up" style="animation-delay: 0.1s;">
+                    <div class="stat-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-value">6</h3>
+                        <p class="stat-label">缺陷类型</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card stat-card-green animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="stat-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-value">GPU</h3>
+                        <p class="stat-label">硬件加速</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card stat-card-orange animate-fade-in-up" style="animation-delay: 0.3s;">
+                    <div class="stat-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-value">Fast</h3>
+                        <p class="stat-label">推理速度</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="stat-card stat-card-purple animate-fade-in-up" style="animation-delay: 0.4s;">
+                    <div class="stat-icon">
+                        <i class="fas fa-shield-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-value">70%</h3>
+                        <p class="stat-label">准确率</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-12">
+                <div class="section-header text-center mb-4">
+                    <h2 class="section-title">核心功能</h2>
+                    <p class="section-subtitle">提供全方位的钢材缺陷检测解决方案</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card animate-fade-in-up" style="animation-delay: 0.1s;">
+                    <div class="feature-icon-wrapper feature-icon-blue">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 class="feature-title">单图检测</h3>
+                        <p class="feature-description">
+                            上传单张图片，快速识别缺陷类型、位置和置信度，支持多种图像格式
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check-circle text-success"></i> 支持 JPG/PNG/BMP</li>
+                            <li><i class="fas fa-check-circle text-success"></i> 实时可视化结果</li>
+                            <li><i class="fas fa-check-circle text-success"></i> 一键导出报告</li>
+                        </ul>
+                        <a href="{{ url_for('detect') }}" class="btn btn-primary btn-sm mt-3">
+                            <i class="fas fa-arrow-right me-1"></i>立即使用
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="feature-icon-wrapper feature-icon-green">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 class="feature-title">批量检测</h3>
+                        <p class="feature-description">
+                            上传整个文件夹，批量处理多张图像，自动打包下载检测结果
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check-circle text-success"></i> 批量上传处理</li>
+                            <li><i class="fas fa-check-circle text-success"></i> 进度实时显示</li>
+                            <li><i class="fas fa-check-circle text-success"></i> 结果自动归档</li>
+                        </ul>
+                        <a href="{{ url_for('detect') }}" class="btn btn-primary btn-sm mt-3">
+                            <i class="fas fa-arrow-right me-1"></i>批量处理
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card animate-fade-in-up" style="animation-delay: 0.3s;">
+                    <div class="feature-icon-wrapper feature-icon-orange">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3 class="feature-title">模型管理</h3>
+                        <p class="feature-description">
+                            灵活切换不同的检测模型，支持自定义模型上传与配置
+                        </p>
+                        <ul class="feature-list">
+                            <li><i class="fas fa-check-circle text-success"></i> 多模型支持</li>
+                            <li><i class="fas fa-check-circle text-success"></i> 热加载切换</li>
+                            <li><i class="fas fa-check-circle text-success"></i> 版本管理</li>
+                        </ul>
+                        <a href="{{ url_for('detect') }}" class="btn btn-outline-secondary btn-sm mt-3 disabled">
+                            <i class="fas fa-lock me-1"></i>即将上线
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-lg-6">
+                <div class="info-card info-card-gradient animate-fade-in-left">
+                    <div class="info-card-body">
+                        <div class="info-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4 class="info-title">智能检测流程</h4>
+                            <p class="info-text">
+                                系统采用先进的 YOLOX 目标检测算法，结合 NEU-DET 数据集训练，
+                                能够精准识别 6 类常见钢材表面缺陷。
+                            </p>
+                            <div class="info-tags">
+                                <span class="tag tag-blue">YOLOX</span>
+                                <span class="tag tag-green">NEU-DET</span>
+                                <span class="tag tag-orange">CUDA</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="info-card animate-fade-in-right">
+                    <div class="info-card-body">
+                        <div class="info-icon info-icon-outline">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4 class="info-title">支持的缺陷类型</h4>
+                            <div class="defect-types-grid">
+                                <div class="defect-type-item">
+                                    <span class="defect-dot defect-crazing"></span>
+                                    <span>Crazing (裂纹)</span>
+                                </div>
+                                <div class="defect-type-item">
+                                    <span class="defect-dot defect-inclusion"></span>
+                                    <span>Inclusion (夹杂物)</span>
+                                </div>
+                                <div class="defect-type-item">
+                                    <span class="defect-dot defect-patches"></span>
+                                    <span>Patches (斑块)</span>
+                                </div>
+                                <div class="defect-type-item">
+                                    <span class="defect-dot defect-pitted_surface"></span>
+                                    <span>Pitted Surface (点蚀面)</span>
+                                </div>
+                                <div class="defect-type-item">
+                                    <span class="defect-dot defect-rolled-in_scale"></span>
+                                    <span>Rolled-in Scale (氧化皮压入)</span>
+                                </div>
+                                <div class="defect-type-item">
+                                    <span class="defect-dot defect-scratches"></span>
+                                    <span>Scratches (划痕)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="quick-start-card animate-fade-in-up">
+                    <div class="quick-start-header">
+                        <div class="quick-start-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div>
+                            <h4 class="quick-start-title">快速开始</h4>
+                            <p class="quick-start-text">只需三步，即可完成缺陷检测</p>
+                        </div>
+                    </div>
+                    <div class="quick-steps">
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h5>选择/上传模型</h5>
+                                <p>选择预训练模型或上传自定义模型文件</p>
+                            </div>
+                        </div>
+                        <div class="step-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h5>上传待检测图像</h5>
+                                <p>支持单图或批量上传多种格式图像</p>
+                            </div>
+                        </div>
+                        <div class="step-arrow">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h5>查看检测结果</h5>
+                                <p>实时查看标注结果并导出检测报告</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="quick-start-action">
+                        <a href="{{ url_for('detect') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-play me-2"></i>前往检测中心
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-container {
+    min-height: calc(100vh - 76px);
+    background: var(--bg-body);
+}
+
+.dashboard-container .container,
+.dashboard-container > div:not(.hero-section) > .container {
+    max-width: 100% !important;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #60a5fa 100%);
+    padding: 80px 24px 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.4;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 8px 20px;
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.15rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0;
+    line-height: 1.6;
+}
+
+.hero-actions .btn {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    transition: all var(--transition-base);
+}
+
+.hero-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.hero-actions .btn-outline-primary {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+}
+
+.hero-actions .btn-outline-primary:hover {
+    background: white;
+    border-color: white;
+    color: var(--primary);
+}
+
+.hero-illustration {
+    position: relative;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floating-card {
+    position: absolute;
+    background: white;
+    padding: 16px 24px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: float 3s ease-in-out infinite;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+.floating-card i {
+    font-size: 1.5rem;
+}
+
+.card-1 {
+    top: 20px;
+    left: 20px;
+    animation-delay: 0s;
+}
+
+.card-1 i { color: #3b82f6; }
+
+.card-2 {
+    top: 80px;
+    right: 20px;
+    animation-delay: 0.5s;
+}
+
+.card-2 i { color: #059669; }
+
+.card-3 {
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation-delay: 1s;
+}
+
+.card-3 i { color: #d97706; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.stat-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+    border: 1px solid var(--border-color);
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.stat-card-blue .stat-icon {
+    background: var(--primary-bg);
+    color: var(--primary);
+}
+
+.stat-card-green .stat-icon {
+    background: var(--success-light);
+    color: var(--success);
+}
+
+.stat-card-orange .stat-icon {
+    background: var(--warning-light);
+    color: var(--warning);
+}
+
+.stat-card-purple .stat-icon {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+    font-weight: 500;
+}
+
+.section-header {
+    margin-bottom: 32px;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.section-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+}
+
+.feature-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    height: 100%;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+    display: flex;
+    flex-direction: column;
+}
+
+.feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-light);
+}
+
+.feature-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin-bottom: 20px;
+    transition: all var(--transition-base);
+}
+
+.feature-card:hover .feature-icon-wrapper {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.feature-icon-blue {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    color: white;
+}
+
+.feature-icon-green {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: white;
+}
+
+.feature-icon-orange {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    color: white;
+}
+
+.feature-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.feature-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px 0;
+}
+
+.feature-list li {
+    padding: 6px 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.feature-list li i {
+    font-size: 0.85rem;
+}
+
+.info-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    height: 100%;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+}
+
+.info-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.info-card-gradient {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    border: none;
+    color: white;
+}
+
+.info-card-gradient:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.info-card-body {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.info-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    color: white;
+}
+
+.info-icon-outline {
+    background: var(--primary-bg);
+    color: var(--primary);
+}
+
+.info-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: inherit;
+}
+
+.info-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    opacity: 0.95;
+    margin-bottom: 16px;
+}
+
+.info-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.tag-blue {
+    background: rgba(59, 130, 246, 0.2);
+    color: #93c5fd;
+}
+
+.tag-green {
+    background: rgba(5, 150, 105, 0.2);
+    color: #6ee7b7;
+}
+
+.tag-orange {
+    background: rgba(217, 119, 6, 0.2);
+    color: #fcd34d;
+}
+
+.defect-types-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.defect-type-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.defect-type-item:hover {
+    background: var(--gray-100);
+    transform: translateX(4px);
+}
+
+.defect-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.defect-crazing { background: #ef4444; }
+.defect-inclusion { background: #f97316; }
+.defect-patches { background: #eab308; }
+.defect-pitted_surface { background: #22c55e; }
+.defect-rolled-in_scale { background: #3b82f6; }
+.defect-scratches { background: #8b5cf6; }
+
+.quick-start-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 36px;
+    border: 2px solid var(--primary-light);
+    box-shadow: var(--shadow-md);
+}
+
+.quick-start-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.quick-start-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.quick-start-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.quick-start-text {
+    color: var(--text-secondary);
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+.quick-steps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    gap: 16px;
+}
+
+.step-item {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+}
+
+.step-item:hover {
+    background: var(--primary-bg);
+    transform: translateY(-2px);
+}
+
+.step-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.step-content h5 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.step-content p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+}
+
+.step-arrow {
+    color: var(--gray-400);
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    padding-top: 30px;
+}
+
+.quick-start-action {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 991.98px) {
+    .hero-title {
+        font-size: 2.25rem;
+    }
+    
+    .hero-section {
+        padding: 60px 16px 40px;
+    }
+    
+    .dashboard-container .container,
+    .dashboard-container > div:not(.hero-section) > .container {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    
+    .quick-steps {
+        flex-direction: column;
+    }
+    
+    .step-arrow {
+        transform: rotate(90deg);
+        padding-top: 0;
+    }
+    
+    .defect-types-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .hero-title {
+        font-size: 1.85rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .hero-actions .btn {
+        padding: 12px 24px;
+        font-size: 0.95rem;
+    }
+    
+    .section-title {
+        font-size: 1.6rem;
+    }
+    
+    .stat-card {
+        padding: 20px;
+    }
+    
+    .feature-card {
+        padding: 24px;
+    }
+    
+    .quick-start-card {
+        padding: 24px;
+    }
+}
+</style>
+
+<script>
+function scrollToFeatures() {
+    document.getElementById('features-section').scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+    });
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,580 @@
+{% extends "base.html" %}
+{% block title %}注册 - NEU-DET{% endblock %}
+{% block content %}
+
+<div class="register-wrapper">
+    <div class="register-card animate-fade-in-up">
+        <div class="register-header">
+            <div class="register-logo">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <h1 class="register-title">创建账户</h1>
+            <p class="register-subtitle">加入 NEU-DET 智能检测平台</p>
+        </div>
+
+        <form method="post" id="registerForm">
+            <div class="form-group-register mb-4">
+                <label class="form-label-register">
+                    <i class="fas fa-user me-2"></i>用户名
+                </label>
+                <div class="input-group-register">
+                    <span class="input-icon-left-reg">
+                        <i class="fas fa-at"></i>
+                    </span>
+                    <input type="text" name="username" class="form-input-register" 
+                           placeholder="请输入用户名" required 
+                           autocomplete="username"
+                           oninput="validateUsername(this)">
+                    <span class="input-validation" id="usernameValidation"></span>
+                </div>
+                <small class="form-hint">用户名长度 3-20 个字符，支持字母、数字和下划线</small>
+            </div>
+
+            <div class="form-group-register mb-4">
+                <label class="form-label-register">
+                    <i class="fas fa-lock me-2"></i>密码
+                </label>
+                <div class="input-group-register">
+                    <span class="input-icon-left-reg">
+                        <i class="fas fa-key"></i>
+                    </span>
+                    <input type="password" name="password" class="form-input-register" 
+                           placeholder="请设置密码" required
+                           id="passwordInput"
+                           autocomplete="new-password"
+                           oninput="validatePassword(this)">
+                    <button type="button" class="btn-toggle-password" onclick="togglePasswordVisibility()">
+                        <i class="fas fa-eye" id="eyeIconReg"></i>
+                    </button>
+                </div>
+                <div class="password-strength" id="passwordStrength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                    <span class="strength-text" id="strengthText"></span>
+                </div>
+            </div>
+
+            <div class="form-group-register mb-4">
+                <label class="form-label-register">
+                    <i class="fas fa-shield-alt me-2"></i>确认密码
+                </label>
+                <div class="input-group-register">
+                    <span class="input-icon-left-reg">
+                        <i class="fas fa-check-double"></i>
+                    </span>
+                    <input type="password" name="confirm_password" class="form-input-register" 
+                           placeholder="请再次输入密码" required
+                           id="confirmPasswordInput"
+                           autocomplete="new-password"
+                           oninput="validateConfirmPassword()">
+                    <span class="input-validation" id="confirmValidation"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-register btn-lg w-100 mb-3" id="submitBtn">
+                <i class="fas fa-user-plus me-2"></i>创建账户
+            </button>
+        </form>
+
+        <div class="register-divider">
+            或
+        </div>
+
+        <p class="text-center mb-0 register-footer-text">
+            已有企业账户？ 
+            <a href="{{ url_for('login') }}" class="fw-bold text-decoration-none login-link">
+                立即登录 <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </p>
+
+        <div class="register-features mt-4">
+            <div class="feature-item">
+                <i class="fas fa-check-circle text-success"></i>
+                <span>免费使用所有检测功能</span>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-check-circle text-success"></i>
+                <span>安全的账户保护机制</span>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-check-circle text-success"></i>
+                <span>专业的技术支持服务</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.register-wrapper {
+    min-height: calc(100vh - 76px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #dbeafe 100%);
+    padding: 40px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.register-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.register-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.06) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.register-card {
+    width: 100%;
+    max-width: 480px;
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: 44px 36px;
+    box-shadow: var(--shadow-xl);
+    position: relative;
+    z-index: 1;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.register-logo {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #059669, #10b981);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.85rem;
+    color: white;
+    box-shadow: 0 8px 24px rgba(5, 150, 105, 0.25);
+}
+
+.register-title {
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.register-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+.form-group-register {
+    position: relative;
+}
+
+.form-label-register {
+    display: block;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.input-group-register {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon-left-reg {
+    position: absolute;
+    left: 16px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.form-input-register {
+    width: 100%;
+    padding: 14px 48px 14px 46px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 0.98rem;
+    transition: all var(--transition-fast);
+    background: white;
+}
+
+.form-input-register:focus {
+    outline: none;
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.form-input-register.is-valid {
+    border-color: var(--success);
+}
+
+.form-input-register.is-invalid {
+    border-color: var(--danger);
+}
+
+.btn-toggle-password {
+    position: absolute;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    z-index: 1;
+}
+
+.btn-toggle-password:hover {
+    color: var(--primary);
+}
+
+.input-validation {
+    position: absolute;
+    right: 12px;
+    font-size: 0.85rem;
+    display: none;
+}
+
+.input-validation.show {
+    display: block;
+}
+
+.input-validation.valid {
+    color: var(--success);
+}
+
+.input-validation.invalid {
+    color: var(--danger);
+}
+
+.form-hint {
+    display: block;
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 0.84rem;
+}
+
+.password-strength {
+    margin-top: 12px;
+    display: none;
+}
+
+.password-strength.show {
+    display: block;
+}
+
+.strength-bar {
+    height: 4px;
+    background: var(--gray-200);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: var(--radius-full);
+    transition: all var(--transition-base);
+}
+
+.strength-fill.weak {
+    width: 33%;
+    background: var(--danger);
+}
+
+.strength-fill.medium {
+    width: 66%;
+    background: var(--warning);
+}
+
+.strength-fill.strong {
+    width: 100%;
+    background: var(--success);
+}
+
+.strength-text {
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.weak + .strength-text { color: var(--danger); }
+.medium + .strength-text { color: var(--warning); }
+.strong + .strength-text { color: var(--success); }
+
+.btn-register {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: white;
+    border: none;
+    padding: 15px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-register::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-register:hover::before {
+    left: 100%;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(5, 150, 105, 0.35);
+}
+
+.btn-register:active {
+    transform: translateY(0);
+}
+
+.register-divider {
+    text-align: center;
+    position: relative;
+    margin: 28px 0;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.92rem;
+}
+
+.register-divider::before,
+.register-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 42%;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.register-divider::before {
+    left: 0;
+}
+
+.register-divider::after {
+    right: 0;
+}
+
+.register-footer-text {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.login-link {
+    color: #059669;
+    transition: all var(--transition-fast);
+}
+
+.login-link:hover {
+    color: #047857;
+}
+
+.register-features {
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.feature-item i {
+    font-size: 0.85rem;
+}
+
+@media (max-width: 575.98px) {
+    .register-wrapper {
+        padding: 20px 16px;
+    }
+    
+    .register-card {
+        padding: 32px 24px;
+        border-radius: var(--radius-lg);
+    }
+    
+    .register-title {
+        font-size: 1.55rem;
+    }
+    
+    .register-logo {
+        width: 60px;
+        height: 60px;
+        font-size: 1.55rem;
+    }
+}
+</style>
+
+<script>
+function togglePasswordVisibility() {
+    const passwordInput = document.getElementById('passwordInput');
+    const eyeIcon = document.getElementById('eyeIconReg');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+    }
+}
+
+function validateUsername(input) {
+    const value = input.value.trim();
+    const validation = document.getElementById('usernameValidation');
+    
+    if (value.length === 0) {
+        input.classList.remove('is-valid', 'is-invalid');
+        validation.classList.remove('show');
+        return false;
+    }
+    
+    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+    
+    if (usernameRegex.test(value)) {
+        input.classList.remove('is-invalid');
+        input.classList.add('is-valid');
+        validation.innerHTML = '<i class="fas fa-check-circle"></i>';
+        validation.className = 'input-validation show valid';
+        return true;
+    } else {
+        input.classList.remove('is-valid');
+        input.classList.add('is-invalid');
+        validation.innerHTML = '<i class="fas fa-times-circle"></i>';
+        validation.className = 'input-validation show invalid';
+        return false;
+    }
+}
+
+function validatePassword(input) {
+    const value = input.value;
+    const strengthDiv = document.getElementById('passwordStrength');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    
+    if (value.length === 0) {
+        strengthDiv.classList.remove('show');
+        return;
+    }
+    
+    strengthDiv.classList.add('show');
+    
+    let strength = 0;
+    if (value.length >= 8) strength++;
+    if (/[A-Z]/.test(value)) strength++;
+    if (/[0-9]/.test(value)) strength++;
+    if (/[^A-Za-z0-9]/.test(value)) strength++;
+    
+    strengthFill.className = 'strength-fill';
+    
+    if (strength <= 1) {
+        strengthFill.classList.add('weak');
+        strengthText.textContent = '弱 - 建议使用更复杂的密码';
+    } else if (strength <= 2) {
+        strengthFill.classList.add('medium');
+        strengthText.textContent = '中等 - 可以更强';
+    } else {
+        strengthFill.classList.add('strong');
+        strengthText.textContent = '强 - 非常安全';
+    }
+    
+    validateConfirmPassword();
+}
+
+function validateConfirmPassword() {
+    const password = document.getElementById('passwordInput').value;
+    const confirmInput = document.getElementById('confirmPasswordInput');
+    const confirmValue = confirmInput.value;
+    const validation = document.getElementById('confirmValidation');
+    
+    if (confirmValue.length === 0) {
+        confirmInput.classList.remove('is-valid', 'is-invalid');
+        validation.classList.remove('show');
+        return false;
+    }
+    
+    if (password === confirmValue) {
+        confirmInput.classList.remove('is-invalid');
+        confirmInput.classList.add('is-valid');
+        validation.innerHTML = '<i class="fas fa-check-circle"></i>';
+        validation.className = 'input-validation show valid';
+        return true;
+    } else {
+        confirmInput.classList.remove('is-valid');
+        confirmInput.classList.add('is-invalid');
+        validation.innerHTML = '<i class="fas fa-times-circle"></i>';
+        validation.className = 'input-validation show invalid';
+        return false;
+    }
+}
+
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    const username = document.querySelector('input[name="username"]');
+    const password = document.getElementById('passwordInput');
+    const confirmPassword = document.getElementById('confirmPasswordInput');
+    
+    let isValid = true;
+    
+    if (!validateUsername(username)) {
+        isValid = false;
+    }
+    
+    if (password.value.length < 6) {
+        alert('密码长度至少为6个字符');
+        isValid = false;
+    }
+    
+    if (password.value !== confirmPassword.value) {
+        alert('两次输入的密码不一致');
+        isValid = false;
+    }
+    
+    if (!isValid) {
+        e.preventDefault();
+    }
+});
+</script>
+
+{% endblock %}

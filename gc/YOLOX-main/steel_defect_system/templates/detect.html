@@ -1,0 +1,945 @@
+{% extends "base.html" %}
+{% block title %}检测中心 - NEU-DET{% endblock %}
+{% block content %}
+
+<div class="detect-container">
+    <div class="container-fluid px-4 py-3">
+        <div class="page-header animate-fade-in-up">
+            <div class="row align-items-center">
+                <div class="col">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <div class="page-icon">
+                            <i class="fas fa-crosshairs"></i>
+                        </div>
+                        <div>
+                            <h1 class="page-title">检测中心</h1>
+                            <p class="page-subtitle">上传图像进行智能缺陷检测分析</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="upload-section">
+                    <div class="section-tabs">
+                        <button class="tab-btn active" onclick="switchTab('single')">
+                            <i class="fas fa-image me-2"></i>单图检测
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('batch')">
+                            <i class="fas fa-folder-plus me-2"></i>文件夹检测
+                        </button>
+                    </div>
+
+                    <div class="tab-content active" id="single-tab">
+                        <div class="upload-card animate-fade-in-up" id="dropZoneSingle">
+                            <div class="upload-header">
+                                <div class="upload-icon-wrapper">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <h3 class="upload-title">拖放图片到此处</h3>
+                                <p class="upload-subtitle">或点击选择文件</p>
+                                <p class="upload-hint">
+                                    支持 JPG, PNG, BMP 格式 · 最大 16MB
+                                </p>
+                            </div>
+                            <form method="post" enctype="multipart/form-data" id="singleForm">
+                                <input type="file" name="file" id="singleFileInput" 
+                                       accept="image/*" required class="d-none">
+                                <div class="selected-file-info d-none" id="singleFileInfo">
+                                    <div class="file-preview-wrapper">
+                                        <img id="singlePreview" src="" alt="预览图">
+                                    </div>
+                                    <div class="file-details">
+                                        <span class="file-name" id="singleFileName"></span>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                onclick="clearSingleFile()">
+                                            <i class="fas fa-times me-1"></i>移除
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="upload-actions mt-4">
+                                    <button type="button" class="btn btn-outline-primary" 
+                                            onclick="document.getElementById('singleFileInput').click()">
+                                        <i class="fas fa-folder-open me-2"></i>选择文件
+                                    </button>
+                                    <button type="submit" class="btn btn-primary px-5" id="singleSubmitBtn" disabled>
+                                        <i class="fas fa-search me-2"></i>开始检测
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="batch-tab">
+                        <div class="upload-card animate-fade-in-up" id="dropZoneBatch">
+                            <div class="upload-header">
+                                <div class="upload-icon-wrapper upload-icon-batch">
+                                    <i class="fas fa-folder-plus"></i>
+                                </div>
+                                <h3 class="upload-title">选择文件夹进行检测</h3>
+                                <p class="upload-subtitle">点击按钮选择包含图片的文件夹</p>
+                                <p class="upload-hint">
+                                    支持 JPG, PNG, BMP 格式 · 自动扫描子目录 · 单个文件最大 16MB
+                                </p>
+                            </div>
+                            <form method="post" enctype="multipart/form-data" id="batchForm" action="/api/detect-folder">
+                                <input type="file" name="files" id="batchFileInput"
+                                       webkitdirectory directory multiple accept="image/*" required class="d-none">
+                                <div class="selected-files-list d-none" id="batchFilesInfo">
+                                    <div class="files-list-header">
+                                        <span><i class="fas fa-folder-open me-2"></i>已选择文件夹</span>
+                                        <span class="files-count" id="filesCount">0 个文件</span>
+                                    </div>
+                                    <div class="folder-info-box">
+                                        <div class="folder-info-item">
+                                            <i class="fas fa-folder text-warning me-2"></i>
+                                            <span>文件夹路径: <strong id="folderPath">-</strong></span>
+                                        </div>
+                                        <div class="folder-info-item">
+                                            <i class="fas fa-images text-primary me-2"></i>
+                                            <span>图片文件数: <strong id="imageFileCount">0</strong></span>
+                                        </div>
+                                        <div class="folder-info-item">
+                                            <i class="fas fa-hdd text-success me-2"></i>
+                                            <span>总大小: <strong id="totalSize">0 MB</strong></span>
+                                        </div>
+                                    </div>
+                                    <div class="files-grid" id="filesGrid"></div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-3"
+                                            onclick="clearBatchFiles()">
+                                        <i class="fas fa-trash me-1"></i>清空重新选择
+                                    </button>
+                                </div>
+                                <div class="upload-actions mt-4">
+                                    <button type="button" class="btn btn-outline-success"
+                                            onclick="document.getElementById('batchFileInput').click()">
+                                        <i class="fas fa-folder-plus me-2"></i>选择文件夹
+                                    </button>
+                                    <button type="submit" class="btn btn-success px-5" id="batchSubmitBtn" disabled>
+                                        <i class="fas fa-play-circle me-2"></i>开始检测全部图片
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="model-card animate-fade-in-up" style="animation-delay: 0.1s;">
+                    <div class="card-header-custom">
+                        <i class="fas fa-cube me-2"></i>模型配置
+                    </div>
+                    <div class="card-body-custom">
+                        <div class="model-status mb-4">
+                            <div class="status-indicator status-online">
+                                <span class="status-dot"></span>
+                                <span class="status-text">模型就绪</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label-custom">当前模型</label>
+                            <div class="current-model-display">
+                                <i class="fas fa-brain text-primary"></i>
+                                <span id="currentModelName">YOLOX-S (NEU-DET)</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label-custom">上传自定义模型</label>
+                            <div class="model-upload-area" id="modelDropZone">
+                                <input type="file" id="modelFileInput" 
+                                       accept=".pt,.pth,.onnx" class="d-none">
+                                <div class="model-upload-content" onclick="document.getElementById('modelFileInput').click()">
+                                    <i class="fas fa-upload mb-2"></i>
+                                    <p class="mb-1">点击或拖放到此处</p>
+                                    <small class="text-muted">支持 .pt / .pth / .onnx</small>
+                                </div>
+                                <div class="selected-model-info d-none" id="modelFileInfo">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span class="fw-bold" id="modelName"></span>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" 
+                                                onclick="clearModelFile()">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <small class="text-muted" id="modelSize"></small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary w-100" onclick="switchModel()" id="switchModelBtn">
+                            <i class="fas fa-sync-alt me-2"></i>切换模型
+                        </button>
+                    </div>
+                </div>
+
+                <div class="info-card-sidebar animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <div class="info-card-header">
+                        <i class="fas fa-info-circle me-2"></i>检测信息
+                    </div>
+                    <div class="info-card-body">
+                        <div class="info-item">
+                            <span class="info-label">支持的缺陷类型</span>
+                            <span class="info-value">6 类</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">推理设备</span>
+                            <span class="info-value badge bg-primary">GPU/CUDA</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">置信度阈值</span>
+                            <span class="info-value">0.25</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">NMS 阈值</span>
+                            <span class="info-value">0.45</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-section d-none" id="resultSection">
+            <div class="result-header">
+                <h2><i class="fas fa-chart-bar me-2"></i>检测结果</h2>
+                <div class="result-actions">
+                    <button class="btn btn-outline-primary btn-sm" onclick="downloadResult()">
+                        <i class="fas fa-download me-1"></i>下载结果
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="clearResult()">
+                        <i class="fas fa-redo me-1"></i>重新检测
+                    </button>
+                </div>
+            </div>
+            <div class="result-content" id="resultContent">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.detect-container {
+    min-height: calc(100vh - 76px);
+    background: var(--bg-body);
+}
+
+.detect-container .container {
+    max-width: 100% !important;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.page-header {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.page-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.page-subtitle {
+    color: var(--text-secondary);
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+.upload-section {
+    background: white;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.section-tabs {
+    display: flex;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--border-color);
+    padding: 8px;
+    gap: 4px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab-btn:hover {
+    background: rgba(59, 130, 246, 0.05);
+    color: var(--primary);
+}
+
+.tab-btn.active {
+    background: white;
+    color: var(--primary);
+    box-shadow: var(--shadow-xs);
+}
+
+.tab-content {
+    display: none;
+    padding: 32px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.upload-card {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 48px 32px;
+    text-align: center;
+    transition: all var(--transition-base);
+    background: var(--gray-50);
+    position: relative;
+}
+
+.upload-card:hover,
+.upload-card.dragover {
+    border-color: var(--primary-light);
+    background: var(--primary-bg);
+    transform: translateY(-2px);
+}
+
+.upload-card.dragover {
+    border-style: solid;
+}
+
+.upload-header {
+    pointer-events: none;
+}
+
+.upload-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.25rem;
+    color: var(--primary);
+    margin-bottom: 20px;
+    transition: all var(--transition-base);
+}
+
+.upload-card:hover .upload-icon-wrapper {
+    transform: scale(1.08);
+}
+
+.upload-icon-batch {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: var(--success);
+}
+
+.upload-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.upload-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 12px;
+}
+
+.upload-hint {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    margin-bottom: 0;
+}
+
+.selected-file-info {
+    margin-top: 24px;
+    padding: 20px;
+    background: white;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.file-preview-wrapper {
+    width: 100%;
+    max-height: 200px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: 16px;
+    background: var(--gray-100);
+}
+
+.file-preview-wrapper img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.file-details {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.file-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    word-break: break-all;
+}
+
+.selected-files-list {
+    margin-top: 24px;
+    padding: 20px;
+    background: white;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.files-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.files-count {
+    color: var(--primary);
+    font-size: 0.9rem;
+}
+
+.files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+    max-height: 240px;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.files-grid-item {
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+    background: var(--gray-100);
+}
+
+.files-grid-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.folder-info-box {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1.5px solid #bae6fd;
+}
+
+.folder-info-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.folder-info-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.folder-info-item strong {
+    color: var(--text-primary);
+    margin-left: 4px;
+}
+
+.upload-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.model-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.card-header-custom {
+    background: linear-gradient(135deg, var(--secondary), #334155);
+    color: white;
+    padding: 18px 24px;
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.card-body-custom {
+    padding: 24px;
+}
+
+.model-status {
+    padding: 14px;
+    background: var(--success-light);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.status-online .status-dot {
+    background: var(--success);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.status-online .status-text {
+    color: var(--success);
+}
+
+.form-label-custom {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    font-size: 0.92rem;
+}
+
+.current-model-display {
+    padding: 14px 18px;
+    background: var(--primary-bg);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 0.95rem;
+}
+
+.model-upload-area {
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    text-align: center;
+    transition: all var(--transition-base);
+    cursor: pointer;
+    background: var(--gray-50);
+}
+
+.model-upload-area:hover {
+    border-color: var(--primary-light);
+    background: var(--primary-bg);
+}
+
+.model-upload-content i {
+    font-size: 1.75rem;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.model-upload-content p {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    font-size: 0.92rem;
+}
+
+.selected-model-info {
+    padding: 16px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.info-card-sidebar {
+    background: white;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.info-card-header {
+    background: var(--gray-50);
+    padding: 16px 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.95rem;
+}
+
+.info-card-body {
+    padding: 20px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.info-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.info-value {
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.result-section {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 28px 32px;
+    margin-top: 24px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--primary-bg);
+}
+
+.result-header h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0;
+}
+
+.result-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.result-content {
+    min-height: 300px;
+}
+
+@media (max-width: 991.98px) {
+    .col-lg-4 {
+        margin-top: 24px;
+    }
+    
+    .upload-card {
+        padding: 36px 20px;
+    }
+    
+    .upload-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        font-size: 1.85rem;
+    }
+    
+    .upload-title {
+        font-size: 1.15rem;
+    }
+    
+    .section-tabs {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    if (tab === 'single') {
+        document.querySelector('.tab-btn:first-child').classList.add('active');
+        document.getElementById('single-tab').classList.add('active');
+    } else {
+        document.querySelector('.tab-btn:last-child').classList.add('active');
+        document.getElementById('batch-tab').classList.add('active');
+    }
+}
+
+const singleFileInput = document.getElementById('singleFileInput');
+const dropZoneSingle = document.getElementById('dropZoneSingle');
+
+singleFileInput.addEventListener('change', function(e) {
+    handleSingleFileSelect(e.target.files[0]);
+});
+
+dropZoneSingle.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('dragover');
+});
+
+dropZoneSingle.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+});
+
+dropZoneSingle.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0 && files[0].type.startsWith('image/')) {
+        singleFileInput.files = files;
+        handleSingleFileSelect(files[0]);
+    }
+});
+
+function handleSingleFileSelect(file) {
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('singlePreview').src = e.target.result;
+        document.getElementById('singleFileName').textContent = file.name;
+        document.getElementById('singleFileInfo').classList.remove('d-none');
+        document.getElementById('singleSubmitBtn').disabled = false;
+        
+        dropZoneSingle.querySelector('.upload-header').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+}
+
+function clearSingleFile() {
+    singleFileInput.value = '';
+    document.getElementById('singlePreview').src = '';
+    document.getElementById('singleFileName').textContent = '';
+    document.getElementById('singleFileInfo').classList.add('d-none');
+    document.getElementById('singleSubmitBtn').disabled = true;
+    dropZoneSingle.querySelector('.upload-header').style.display = 'block';
+}
+
+const batchFileInput = document.getElementById('batchFileInput');
+const dropZoneBatch = document.getElementById('dropZoneBatch');
+
+batchFileInput.addEventListener('change', function(e) {
+    handleBatchFilesSelect(e.target.files);
+});
+
+function handleBatchFilesSelect(files) {
+    const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+    if (validFiles.length === 0) return;
+
+    const grid = document.getElementById('filesGrid');
+    grid.innerHTML = '';
+
+    let totalSizeBytes = 0;
+    let processedCount = 0;
+
+    validFiles.forEach((file, index) => {
+        totalSizeBytes += file.size;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const item = document.createElement('div');
+            item.className = 'files-grid-item';
+            item.innerHTML = `<img src="${e.target.result}" alt="${file.name}" title="${file.name}">`;
+            grid.appendChild(item);
+
+            processedCount++;
+
+            if (processedCount === validFiles.length) {
+                document.getElementById('filesCount').textContent = `${validFiles.length} 个图片`;
+                document.getElementById('imageFileCount').textContent = validFiles.length.toString();
+                document.getElementById('totalSize').textContent = formatFileSize(totalSizeBytes);
+                
+                const firstFile = files[0];
+                if (firstFile && firstFile.webkitRelativePath) {
+                    const folderPath = firstFile.webkitRelativePath.split('/')[0];
+                    document.getElementById('folderPath').textContent = folderPath || '已选择文件夹';
+                } else {
+                    document.getElementById('folderPath').textContent = '已选择文件';
+                }
+                
+                document.getElementById('batchFilesInfo').classList.remove('d-none');
+                document.getElementById('batchSubmitBtn').disabled = false;
+
+                dropZoneBatch.querySelector('.upload-header').style.display = 'none';
+            }
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function clearBatchFiles() {
+    batchFileInput.value = '';
+    document.getElementById('filesGrid').innerHTML = '';
+    document.getElementById('batchFilesInfo').classList.add('d-none');
+    document.getElementById('batchSubmitBtn').disabled = true;
+    document.getElementById('folderPath').textContent = '-';
+    document.getElementById('imageFileCount').textContent = '0';
+    document.getElementById('totalSize').textContent = '0 MB';
+    dropZoneBatch.querySelector('.upload-header').style.display = 'block';
+}
+
+const modelFileInput = document.getElementById('modelFileInput');
+const modelDropZone = document.getElementById('modelDropZone');
+
+modelFileInput.addEventListener('change', function(e) {
+    handleModelFileSelect(e.target.files[0]);
+});
+
+modelDropZone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.style.borderColor = 'var(--primary-light)';
+    this.style.background = 'var(--primary-bg)';
+});
+
+modelDropZone.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.style.borderColor = '';
+    this.style.background = '';
+});
+
+modelDropZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.style.borderColor = '';
+    this.style.background = '';
+    const file = e.dataTransfer.files[0];
+    if (file && (file.name.endsWith('.pt') || file.name.endsWith('.pth') || file.name.endsWith('.onnx'))) {
+        modelFileInput.files = e.dataTransfer.files;
+        handleModelFileSelect(file);
+    }
+});
+
+function handleModelFileSelect(file) {
+    if (!file) return;
+    
+    document.getElementById('modelName').textContent = file.name;
+    document.getElementById('modelSize').textContent = formatFileSize(file.size);
+    document.querySelector('.model-upload-content').style.display = 'none';
+    document.getElementById('modelFileInfo').classList.remove('d-none');
+}
+
+function clearModelFile() {
+    modelFileInput.value = '';
+    document.querySelector('.model-upload-content').style.display = 'block';
+    document.getElementById('modelFileInfo').classList.add('d-none');
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+async function switchModel() {
+    const modelFile = modelFileInput.files[0];
+    if (!modelFile) {
+        alert('请先选择模型文件');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('model_file', modelFile);
+
+    try {
+        const response = await fetch('/api/upload-model', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            document.getElementById('currentModelName').textContent = modelFile.name.replace(/\.(pt|pth|onnx)$/, '');
+            alert(`模型切换成功：${result.message}`);
+        } else {
+            alert(result.error || '模型上传失败');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('网络错误，请检查连接');
+    }
+}
+
+function downloadResult() {
+    console.log('下载结果');
+}
+
+function clearResult() {
+    document.getElementById('resultSection').classList.add('d-none');
+    document.getElementById('resultContent').innerHTML = '';
+    clearSingleFile();
+    clearBatchFiles();
+}
+</script>
+
+{% endblock %}
